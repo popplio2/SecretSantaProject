@@ -16,7 +16,7 @@ public class SecretSanta {
 		SecretSanta newGame = new SecretSanta(players);
 		System.out.println(newGame);
 		
-		newGame.draw("Dan");
+		newGame.draw("Sir Steve");
 	}
 	
 	protected Map<String, String> gameState = new HashMap<>();
