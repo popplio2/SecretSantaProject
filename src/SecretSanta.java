@@ -13,56 +13,90 @@ public class SecretSanta {
 		players.add("Kerri");
 		players.add("Mama Simone");
 		players.add("Sir Steve");
-		SecretSanta newGame = new SecretSanta(players);
-		System.out.println(newGame);
 		
+		SecretSanta newGame = new SecretSanta(players);
+		
+		newGame.draw("Dan");
+		newGame.draw("Alyssa");
+		newGame.draw("Kerri");
+//		newGame.draw("Mama Simone");
+//		newGame.draw("Sir Steve");
+		
+		List<String> newPlayers = new ArrayList<>();
+		newPlayers.add("Nicole");
+		newPlayers.add("Silas");
+		
+//		// insufficient players test
+//		newGame.add(newPlayers);
+
+		// sufficient players
+		newPlayers.add("Youssef");
+		newGame.add(newPlayers);
+		
+		
+		newGame.draw("Nicole");
+		newGame.draw("Silas");
+		newGame.draw("Youssef");
+		
+		// draw the rest
+		newGame.draw("Mama Simone");
 		newGame.draw("Sir Steve");
 	}
 	
 	protected Map<String, String> gameState = new HashMap<>();
-//	protected Map<String, String> drawState = new HashMap<>();
 	
-	protected List<String> hasNotDrawnName = new ArrayList<>();
-	protected List<String> hasDrawnName = new ArrayList<>();
 	protected List<String> undrawnNames = new ArrayList<>();
-	protected List<String> drawnNames = new ArrayList<>();
-//	protected List<String> gameState = new LinkedList<>();
 
 	
 	public SecretSanta(List<String> players) {
 		for (String player : players) {
 			this.gameState.put(player, "");
-			this.hasNotDrawnName.add(player);
 			this.undrawnNames.add(player);
 		}
-		this.arrangeAll();
+		initialArrangement();
 	}
-	private void arrangeAll() {
+	private void initialArrangement() {
 		Collections.shuffle(undrawnNames);
-		
-		// assigning pairs based on random arrangement
-		for (int i = 0; i < undrawnNames.size() - 1; i++) {
-			gameState.put(undrawnNames.get(i), undrawnNames.get(i + 1)); 
-		}
-		
-		// assign last pair
-		gameState.put(undrawnNames.get(undrawnNames.size() - 1), undrawnNames.get(0));
+		assignRemainingPairings();
 	}
 	
 	public void draw(String player) {
 		undrawnNames.remove(player);
-		drawnNames.add(player);
 		
 		System.out.println(player + " is " + gameState.get(player) + "'s Secret Santa!");
 	}
 	
 	public void add(List<String> newPlayers) {
-		if (newPlayers.size() + hasNotDrawnName.size() < 3)
-			System.out.println("Insufficient number of new players for a fair game.");
+		if (newPlayers.size() + this.undrawnNames.size() < 3)
+			System.out.println("\nInsufficient number of new players for a fair game.\n");
 		
 		else {
-			hasNotDrawnName.addAll(newPlayers);
+			System.out.println("\nNew players added.\n");
+			
+			this.undrawnNames.addAll(newPlayers);
+			updateArrangement();
 		}
+	}
+	
+	private void updateArrangement() {
+		// erase previous pairings from undrawn names
+		for (String name : this.undrawnNames)
+			this.gameState.put(name, "");
+		
+		// shuffle undrawn names
+		Collections.shuffle(undrawnNames);
+		
+		// update the state 
+		assignRemainingPairings();
+	}
+	
+	private void assignRemainingPairings() { // assigning pairs based on random arrangement
+		for (int i = 0; i < undrawnNames.size() - 1; i++) {
+			gameState.put(undrawnNames.get(i), undrawnNames.get(i + 1)); 
+		}
+		
+		// assign last pair (last element in list + first element in list)
+		gameState.put(undrawnNames.get(undrawnNames.size() - 1), undrawnNames.get(0));
 	}
 	
 	public String toString() {
@@ -70,6 +104,7 @@ public class SecretSanta {
 		for (String player : this.gameState.keySet()) {
 			str += player + ": " + gameState.get(player) + "\n";
 		}
+		str += "\n";
 		return str;
 	}
 }
