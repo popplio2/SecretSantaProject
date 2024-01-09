@@ -12,21 +12,26 @@ public class SecretSanta {
 		players.add("Dan");
 		players.add("Alyssa");
 		players.add("Kerri");
+		players.add("Mama Simone");
+		players.add("Sir Steve");
 		
 		SecretSanta newGame = new SecretSanta(players);
-		
 		newGame.draw("Dan");
 		newGame.draw("Alyssa");
 		
 		List<String> newPlayers = new ArrayList<>();
-		newPlayers.add("Mama Simone");
-		newPlayers.add("Sir Steve");
+		newPlayers.add("Youssef");
+		newPlayers.add("Silas");
+		newPlayers.add("Nicole");
 		
 		newGame.add(newPlayers);
 
 		newGame.draw("Kerri");
 		newGame.draw("Mama Simone");
 		newGame.draw("Sir Steve");
+		newGame.draw("Youssef");
+		newGame.draw("Silas");
+		newGame.draw("Nicole");
 	}
 	
 	protected Map<String, String> gameState = new HashMap<>();
@@ -121,14 +126,25 @@ public class SecretSanta {
 		int randomIndex;
 		String currentSanta;
 		String currentSantee;
-		for (int i = 0; i < santaList.size(); i++) {
+		
+		// for each player in the santa list, assign them a random santee
+		for (int i = 0; i < santaList.size() && santeeList.size() > 0; i++) { // need to make sure santeeList is not empty bc if santaList is greater than santeeList, then santeeList will run out
 			randomIndex = (int) (Math.random() * santeeList.size());
+			
 			currentSanta = santaList.get(i);
 			currentSantee = santeeList.get(randomIndex);
 			
 			gameState.put(currentSanta, currentSantee); 
 			this.santas.add(currentSanta);
 			this.santees.add(currentSantee);
+			
+			// swapping currentSantee with last element so removal is O(1)
+			String lastEl = santeeList.get(santeeList.size() - 1);
+			santeeList.set(santeeList.size() - 1, currentSantee);
+			santeeList.set(randomIndex, lastEl);
+			
+			// to ensure no two santas get the same santee
+			santeeList.remove(santeeList.size() - 1);
 		}
 	}
 	
