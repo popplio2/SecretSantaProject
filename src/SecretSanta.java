@@ -30,14 +30,31 @@ public class SecretSanta {
 		newGame.draw("Mama Simone");
 		newGame.draw("Sir Steve");
 		newGame.draw("Youssef");
+		
+		
+		newPlayers.add("Abby");
+		newPlayers.add("Charlotte");
+		
+		newGame.add(newPlayers);
+		
 		newGame.draw("Silas");
 		newGame.draw("Nicole");
+		newGame.draw("Abby");
+		newGame.draw("Charlotte");
+		
+		newPlayers.add("Keagan");
+		
+		newGame.add(newPlayers);
 	}
 	
+	// stores preliminary pairings pre-draw
 	protected Map<String, String> gameState = new HashMap<>();
 	
+	// store information gained by drawing
 	protected Set<String> santees = new HashSet<>();
 	protected Set<String> santas = new HashSet<>();
+	
+	// universal set used for complementation
 	protected Set<String> allPlayers = new HashSet<>();
 	
 	public SecretSanta(List<String> players) {
@@ -60,6 +77,8 @@ public class SecretSanta {
 	}
 	
 	public void add(List<String> newPlayers) {
+		this.allPlayers.removeAll(newPlayers); // ensures that there are no duplicates between original and new players
+		
 		if (newPlayers.size() + (this.allPlayers.size() - this.santas.size()) < 3)
 			System.out.println("\nInsufficient number of new players for a fair game.\n");
 		
