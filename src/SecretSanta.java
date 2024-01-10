@@ -19,7 +19,7 @@ public class SecretSanta {
 		newGame.draw("Dan");
 		newGame.draw("Alyssa");
 		
-		List<String> newPlayers = new ArrayList<>();
+		Set<String> newPlayers = new HashSet<>();
 		newPlayers.add("Youssef");
 		newPlayers.add("Silas");
 		newPlayers.add("Nicole");
@@ -43,8 +43,9 @@ public class SecretSanta {
 		newGame.draw("Charlotte");
 		
 		newPlayers.add("Keagan");
-		
 		newGame.add(newPlayers);
+		
+		newGame.draw("Keagan");
 	}
 	
 	// stores preliminary pairings pre-draw
@@ -64,6 +65,14 @@ public class SecretSanta {
 		}
 		initialArrangement();
 	}
+	public SecretSanta(Set<String> players) {
+		for (String player : players) {
+			this.gameState.put(player, "");
+			this.allPlayers.add(player);
+		}
+		initialArrangement();
+	}
+	
 	private void initialArrangement() {
 		List<String> players = new ArrayList<>(this.allPlayers);
 		Collections.shuffle(players);
@@ -71,13 +80,18 @@ public class SecretSanta {
 	}
 	
 	public void draw(String player) {
-		this.santas.add(player);
-		this.santees.add(this.gameState.get(player));
-		System.out.println(player + " is " + this.gameState.get(player) + "'s Secret Santa!");
+		if (!this.allPlayers.contains(player)) { // O(1) for hashSet
+			System.out.println("\nCannot draw player who is not in the game.\n");
+		}
+		else {
+			this.santas.add(player);
+			this.santees.add(this.gameState.get(player));
+			System.out.println(player + " is " + this.gameState.get(player) + "'s Secret Santa!");
+		}
 	}
 	
-	public void add(List<String> newPlayers) {
-		this.allPlayers.removeAll(newPlayers); // ensures that there are no duplicates between original and new players
+	public void add(Set<String> newPlayers) {
+		newPlayers.removeAll(this.allPlayers); // ensures that there are no duplicates between original and new players
 		
 		if (newPlayers.size() + (this.allPlayers.size() - this.santas.size()) < 3)
 			System.out.println("\nInsufficient number of new players for a fair game.\n");
@@ -111,23 +125,27 @@ public class SecretSanta {
 		santasButNotSantees.retainAll(this.santas);
 		santasButNotSantees.removeAll(this.santees);
 		
+		Map<String, String> stateChanges = new HashMap<>();
+		
 		// while !santas x !santees is not empty, !santas x santees -> !santas x !santees
 		while (!notSantasAndNotSantees.isEmpty()) {
 			
-			this.assignPairings(new ArrayList<>(notSantasButSantees), new ArrayList<>(notSantasAndNotSantees));
+			stateChanges.putAll(this.assignPairings(new ArrayList<>(notSantasButSantees), new ArrayList<>(notSantasAndNotSantees)));
 			
-			// need to update sets
-			notSantasButSantees.addAll(this.allPlayers);
-			notSantasButSantees.removeAll(this.santas);
-			notSantasButSantees.retainAll(this.santees);
+			// update sets with new pairings
+			notSantasButSantees.clear();
+			notSantasButSantees.addAll(stateChanges.values());
 			
-			notSantasAndNotSantees.addAll(this.allPlayers);
-			notSantasAndNotSantees.removeAll(this.santas);
-			notSantasAndNotSantees.removeAll(this.santees);
+			notSantasAndNotSantees.removeAll(stateChanges.values());
+			
+			this.gameState.putAll(stateChanges);
+			stateChanges.clear();
 		}
 		
 		// then assign !santas x santees -> santas x !santees
-		this.assignPairings(new ArrayList<>(notSantasButSantees), new ArrayList<>(santasButNotSantees));
+		stateChanges.putAll(this.assignPairings(new ArrayList<>(notSantasButSantees), new ArrayList<>(santasButNotSantees)));
+		
+		this.gameState.putAll(stateChanges); // add all new pairings to gameState
 	}
 	
 	private void assignOrder(List<String> players) { // assigning pairs based on random arrangement
@@ -141,7 +159,9 @@ public class SecretSanta {
 		}
 	}
 	
-	private void assignPairings(List<String> santaList, List<String> santeeList) {
+	private Map<String, String> assignPairings(List<String> santaList, List<String> santeeList) {
+		Map<String, String> stateChanges = new HashMap<>(); // tracks progress in creating next preliminary arrangement
+		
 		int randomIndex;
 		String currentSanta;
 		String currentSantee;
@@ -153,9 +173,7 @@ public class SecretSanta {
 			currentSanta = santaList.get(i);
 			currentSantee = santeeList.get(randomIndex);
 			
-			gameState.put(currentSanta, currentSantee); 
-			this.santas.add(currentSanta);
-			this.santees.add(currentSantee);
+			stateChanges.put(currentSanta, currentSantee); 
 			
 			// swapping currentSantee with last element so removal is O(1)
 			String lastEl = santeeList.get(santeeList.size() - 1);
@@ -165,6 +183,7 @@ public class SecretSanta {
 			// to ensure no two santas get the same santee
 			santeeList.remove(santeeList.size() - 1);
 		}
+		return stateChanges;
 	}
 	
 	public String toString() {
