@@ -49,14 +49,14 @@ public class SecretSanta {
 	}
 	
 	// stores preliminary pairings pre-draw
-	protected Map<String, String> gameState = new HashMap<>();
+	private Map<String, String> gameState = new HashMap<>();
 	
 	// store information gained by drawing
-	protected Set<String> santees = new HashSet<>();
-	protected Set<String> santas = new HashSet<>();
+	private Set<String> santees = new HashSet<>();
+	private Set<String> santas = new HashSet<>();
 	
 	// universal set used for complementation
-	protected Set<String> allPlayers = new HashSet<>();
+	private Set<String> allPlayers = new HashSet<>();
 	
 	public SecretSanta(List<String> players) {
 		for (String player : players) {
