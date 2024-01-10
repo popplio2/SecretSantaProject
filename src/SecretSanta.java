@@ -162,30 +162,43 @@ public class SecretSanta {
 	private Map<String, String> assignPairings(List<String> santaList, List<String> santeeList) {
 		Map<String, String> stateChanges = new HashMap<>(); // tracks progress in creating next preliminary arrangement
 		
-		int randomIndex;
+		int randomSantaIndex;
+		int randomSanteeIndex;
 		String currentSanta;
 		String currentSantee;
 		
-		// for each player in the santa list, assign them a random santee
-		for (int i = 0; i < santaList.size() && santeeList.size() > 0; i++) { // need to make sure santeeList is not empty bc if santaList is greater than santeeList, then santeeList will run out
-			randomIndex = (int) (Math.random() * santeeList.size());
+		String lastEl;
+		
+		// assign a random santa to a random santee until we run out of santas or santees
+		while (santaList.size() > 0 && santeeList.size() > 0) {
+			randomSantaIndex = (int) (Math.random() * santaList.size());
+			randomSanteeIndex = (int) (Math.random() * santeeList.size());
 			
-			currentSanta = santaList.get(i);
-			currentSantee = santeeList.get(randomIndex);
+			// get random santa and santee
+			currentSanta = santaList.get(randomSantaIndex);
+			currentSantee = santeeList.get(randomSanteeIndex);
 			
+			// store this pairing
 			stateChanges.put(currentSanta, currentSantee); 
 			
-			// swapping currentSantee with last element so removal is O(1)
-			String lastEl = santeeList.get(santeeList.size() - 1);
-			santeeList.set(santeeList.size() - 1, currentSantee);
-			santeeList.set(randomIndex, lastEl);
 			
-			// to ensure no two santas get the same santee
+			// swapping currentSantee with last element so removal is O(1)
+			lastEl = santeeList.get(santeeList.size() - 1);
+			santeeList.set(santeeList.size() - 1, currentSantee);
+			santeeList.set(randomSanteeIndex, lastEl);
+			// swapping currentSanta with last element so removal is O(1)
+			lastEl = santaList.get(santaList.size() - 1);
+			santaList.set(santaList.size() - 1, currentSanta);
+			santaList.set(randomSantaIndex, lastEl);
+			
+			// to ensure no two santas get the same santee and vice versa
+			santaList.remove(santaList.size() - 1);
 			santeeList.remove(santeeList.size() - 1);
 		}
 		return stateChanges;
 	}
 	
+	@Override 
 	public String toString() {
 		String str = "";
 		for (String player : this.gameState.keySet()) {
