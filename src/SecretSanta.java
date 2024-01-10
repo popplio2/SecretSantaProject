@@ -18,6 +18,7 @@ public class SecretSanta {
 		SecretSanta newGame = new SecretSanta(players);
 		newGame.draw("Dan");
 		newGame.draw("Alyssa");
+		newGame.draw("Kerri");
 		
 		Set<String> newPlayers = new HashSet<>();
 		newPlayers.add("Youssef");
@@ -26,7 +27,6 @@ public class SecretSanta {
 		
 		newGame.add(newPlayers);
 
-		newGame.draw("Kerri");
 		newGame.draw("Mama Simone");
 		newGame.draw("Sir Steve");
 		newGame.draw("Youssef");
