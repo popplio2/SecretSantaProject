@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SecretSanta {
+public class SecretSanta<E> {
 	public static void main(String[] args) {
 		List<String> players = new ArrayList<>();
 		players.add("Dan");
@@ -15,71 +15,86 @@ public class SecretSanta {
 		players.add("Mama Simone");
 		players.add("Sir Steve");
 		
-		SecretSanta newGame = new SecretSanta(players);
-		newGame.draw("Dan");
-		newGame.draw("Alyssa");
-		newGame.draw("Kerri");
+		SecretSanta<String> game1 = new SecretSanta<>(players);
+		game1.draw("Dan");
+		game1.draw("Alyssa");
+		game1.draw("Kerri");
 		
 		Set<String> newPlayers = new HashSet<>();
 		newPlayers.add("Youssef");
 		newPlayers.add("Silas");
 		newPlayers.add("Nicole");
 		
-		newGame.add(newPlayers);
+		game1.add(newPlayers);
 
-		newGame.draw("Mama Simone");
-		newGame.draw("Sir Steve");
-		newGame.draw("Youssef");
+		game1.draw("Mama Simone");
+		game1.draw("Sir Steve");
+		game1.draw("Youssef");
 		
 		
 		newPlayers.add("Abby");
 		newPlayers.add("Charlotte");
 		
-		newGame.add(newPlayers);
+		game1.add(newPlayers);
 		
-		newGame.draw("Silas");
-		newGame.draw("Nicole");
-		newGame.draw("Abby");
-		newGame.draw("Charlotte");
+		game1.draw("Silas");
+		game1.draw("Nicole");
+		game1.draw("Abby");
+		game1.draw("Charlotte");
 		
 		newPlayers.add("Keagan");
-		newGame.add(newPlayers);
+		game1.add(newPlayers);
 		
-		newGame.draw("Keagan");
+		game1.draw("Keagan");
+		
+		List<Integer> nums = new ArrayList<>();
+		nums.add(1);
+		nums.add(2);
+		nums.add(3);
+		nums.add(4);
+		nums.add(5);
+		
+		SecretSanta<Integer> game2 = new SecretSanta<>(nums);
+		game2.draw(1);
+		game2.draw(2);
+		game2.draw(3);
+		game2.draw(4);
+		game2.draw(5);
+		
 	}
 	
 	// stores preliminary pairings pre-draw
-	private Map<String, String> gameState = new HashMap<>();
+	private Map<E, E> gameState = new HashMap<>();
 	
 	// store information gained by drawing
-	private Set<String> santees = new HashSet<>();
-	private Set<String> santas = new HashSet<>();
+	private Set<E> santees = new HashSet<>();
+	private Set<E> santas = new HashSet<>();
 	
 	// universal set used for complementation
-	private Set<String> allPlayers = new HashSet<>();
+	private Set<E> allPlayers = new HashSet<>();
 	
-	public SecretSanta(List<String> players) {
-		for (String player : players) {
-			this.gameState.put(player, "");
+	public SecretSanta(List<E> players) {
+		for (E player : players) {
+			this.gameState.put(player, null);
 			this.allPlayers.add(player);
 		}
 		initialArrangement();
 	}
-	public SecretSanta(Set<String> players) {
-		for (String player : players) {
-			this.gameState.put(player, "");
+	public SecretSanta(Set<E> players) {
+		for (E player : players) {
+			this.gameState.put(player, null);
 			this.allPlayers.add(player);
 		}
 		initialArrangement();
 	}
 	
 	private void initialArrangement() {
-		List<String> players = new ArrayList<>(this.allPlayers);
+		List<E> players = new ArrayList<>(this.allPlayers);
 		Collections.shuffle(players);
 		assignOrder(players);
 	}
 	
-	public void draw(String player) {
+	public void draw(E player) {
 		if (!this.allPlayers.contains(player)) { // O(1) for hashSet
 			System.out.println("\nCannot draw player who is not in the game.\n");
 		}
@@ -90,7 +105,7 @@ public class SecretSanta {
 		}
 	}
 	
-	public void add(Set<String> newPlayers) {
+	public void add(Set<E> newPlayers) {
 		newPlayers.removeAll(this.allPlayers); // ensures that there are no duplicates between original and new players
 		
 		if (newPlayers.size() + (this.allPlayers.size() - this.santas.size()) < 3)
@@ -105,27 +120,19 @@ public class SecretSanta {
 	}
 	
 	private void updateArrangement() {
-		// erase previous pairings from undrawn names
-		
-		for (String player : this.allPlayers) { // erasing preliminary pairings that were not already drawn
-			if (!this.santas.contains(player))
-				this.gameState.put(player, "");
-		}
-		
-		
-		Set<String> notSantasButSantees = new HashSet<>(this.allPlayers); // !santas x santees (only incoming arrow)
+		Set<E> notSantasButSantees = new HashSet<>(this.allPlayers); // !santas x santees (only incoming arrow)
 		notSantasButSantees.removeAll(this.santas);
 		notSantasButSantees.retainAll(this.santees);
 		
-		Set<String> notSantasAndNotSantees = new HashSet<>(this.allPlayers); // !santas x !santees (no arrows)
+		Set<E> notSantasAndNotSantees = new HashSet<>(this.allPlayers); // !santas x !santees (no arrows)
 		notSantasAndNotSantees.removeAll(this.santas);
 		notSantasAndNotSantees.removeAll(this.santees);
 		
-		Set<String> santasButNotSantees = new HashSet<>(this.allPlayers); // santas x !santees (only outgoing arrow)
+		Set<E> santasButNotSantees = new HashSet<>(this.allPlayers); // santas x !santees (only outgoing arrow)
 		santasButNotSantees.retainAll(this.santas);
 		santasButNotSantees.removeAll(this.santees);
 		
-		Map<String, String> stateChanges = new HashMap<>();
+		Map<E, E> stateChanges = new HashMap<>();
 		
 		// while !santas x !santees is not empty, !santas x santees -> !santas x !santees
 		while (!notSantasAndNotSantees.isEmpty()) {
@@ -148,7 +155,7 @@ public class SecretSanta {
 		this.gameState.putAll(stateChanges); // add all new pairings to gameState
 	}
 	
-	private void assignOrder(List<String> players) { // assigning pairs based on random arrangement
+	private void assignOrder(List<E> players) { // assigning pairs based on random arrangement
 		if (players.size() > 2) {
 			for (int i = 0; i < players.size() - 1; i++) {
 				gameState.put(players.get(i), players.get(i + 1)); 
@@ -159,15 +166,15 @@ public class SecretSanta {
 		}
 	}
 	
-	private Map<String, String> assignPairings(List<String> santaList, List<String> santeeList) {
-		Map<String, String> stateChanges = new HashMap<>(); // tracks progress in creating next preliminary arrangement
+	private Map<E, E> assignPairings(List<E> santaList, List<E> santeeList) {
+		Map<E, E> stateChanges = new HashMap<>(); // tracks progress in creating next preliminary arrangement
 		
 		int randomSantaIndex;
 		int randomSanteeIndex;
-		String currentSanta;
-		String currentSantee;
+		E currentSanta;
+		E currentSantee;
 		
-		String lastEl;
+		E lastEl;
 		
 		// assign a random santa to a random santee until we run out of santas or santees
 		while (santaList.size() > 0 && santeeList.size() > 0) {
@@ -201,7 +208,7 @@ public class SecretSanta {
 	@Override 
 	public String toString() {
 		String str = "";
-		for (String player : this.gameState.keySet()) {
+		for (E player : this.gameState.keySet()) {
 			str += player + ": " + this.gameState.get(player) + "\n";
 		}
 		str += "\n";
