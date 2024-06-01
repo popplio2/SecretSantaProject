@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class SecretSanta {
 	public static void main(String[] args) {
-		List<String> players = new ArrayList<>();
+		Set<String> players = new HashSet<>();
 		players.add("Dan");
 		players.add("Alyssa");
 		players.add("Kerri");
@@ -57,14 +57,7 @@ public class SecretSanta {
 	
 	// universal set used for complementation
 	private Set<String> allPlayers = new HashSet<>();
-	
-	public SecretSanta(List<String> players) {
-		for (String player : players) {
-			this.gameState.put(player, "");
-			this.allPlayers.add(player);
-		}
-		initialArrangement();
-	}
+
 	public SecretSanta(Set<String> players) {
 		for (String player : players) {
 			this.gameState.put(player, "");
